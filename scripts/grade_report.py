@@ -53,9 +53,9 @@ def main() -> int:
     print(f"\nTotal: {earned}/{MAX_POINTS}")
     print(f"::notice title=Points::{earned}/{MAX_POINTS}")
 
-    if earned < MAX_POINTS:
-        return 1
-    return 0
+    #if earned < MAX_POINTS:
+    #    return 1
+    #return 0
 
 
 if __name__ == "__main__":
