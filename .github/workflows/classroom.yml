@@ -28,12 +28,129 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run pytest and generate JSON report
-        run: |
-          pytest tests/test_numpy_programming_exercises.py \
-            --json-report \
-            --json-report-file=report.json || true
+      - name: split_vertically
+        id: split-vertically
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: split_vertically
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_split_vertically
+          timeout: 10
+          max-score: 10
 
-      - name: Compute grade
-        run: |
-          python scripts/grade_report.py
+      - name: split_horizontally
+        id: split-horizontally
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: split_horizontally
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_split_horizontally
+          timeout: 10
+          max-score: 10
+
+      - name: split_and_merge_vertically
+        id: split-and-merge-vertically
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: split_and_merge_vertically
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_split_and_merge_vertically
+          timeout: 10
+          max-score: 10
+
+      - name: split_and_merge_horizontally
+        id: split-and-merge-horizontally
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: split_and_merge_horizontally
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_split_and_merge_horizontally
+          timeout: 10
+          max-score: 10
+
+      - name: rotate_array
+        id: rotate-array
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: rotate_array
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_rotate_array
+          timeout: 10
+          max-score: 10
+
+      - name: rotate_array_empty
+        id: rotate-array-empty
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: rotate_array_empty
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_rotate_array_empty
+          timeout: 10
+          max-score: 5
+
+      - name: create_array_int_cast
+        id: create-array-int-cast
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: create_array_int_cast
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_create_array_int_cast
+          timeout: 10
+          max-score: 10
+
+      - name: create_array_float
+        id: create-array-float
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: create_array_float
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_create_array_float
+          timeout: 10
+          max-score: 10
+
+      - name: evaluate_basic_ops
+        id: evaluate-basic-ops
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: evaluate_basic_ops
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_evaluate_basic_ops
+          timeout: 10
+          max-score: 10
+
+      - name: evaluate_unary_ops
+        id: evaluate-unary-ops
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: evaluate_unary_ops
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_evaluate_unary_ops
+          timeout: 10
+          max-score: 10
+
+      - name: evaluate_errors
+        id: evaluate-errors
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: evaluate_errors
+          setup-command: ""
+          command: pytest -q tests/test_numpy_programming_exercises.py::test_evaluate_errors
+          timeout: 10
+          max-score: 5
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          SPLIT_VERTICALLY_RESULTS: "${{steps.split-vertically.outputs.result}}"
+          SPLIT_HORIZONTALLY_RESULTS: "${{steps.split-horizontally.outputs.result}}"
+          SPLIT_AND_MERGE_VERTICALLY_RESULTS: "${{steps.split-and-merge-vertically.outputs.result}}"
+          SPLIT_AND_MERGE_HORIZONTALLY_RESULTS: "${{steps.split-and-merge-horizontally.outputs.result}}"
+          ROTATE_ARRAY_RESULTS: "${{steps.rotate-array.outputs.result}}"
+          ROTATE_ARRAY_EMPTY_RESULTS: "${{steps.rotate-array-empty.outputs.result}}"
+          CREATE_ARRAY_INT_CAST_RESULTS: "${{steps.create-array-int-cast.outputs.result}}"
+          CREATE_ARRAY_FLOAT_RESULTS: "${{steps.create-array-float.outputs.result}}"
+          EVALUATE_BASIC_OPS_RESULTS: "${{steps.evaluate-basic-ops.outputs.result}}"
+          EVALUATE_UNARY_OPS_RESULTS: "${{steps.evaluate-unary-ops.outputs.result}}"
+          EVALUATE_ERRORS_RESULTS: "${{steps.evaluate-errors.outputs.result}}"
+        with:
+          runners: split-vertically,split-horizontally,split-and-merge-vertically,split-and-merge-horizontally,rotate-array,rotate-array-empty,create-array-int-cast,create-array-float,evaluate-basic-ops,evaluate-unary-ops,evaluate-errors
