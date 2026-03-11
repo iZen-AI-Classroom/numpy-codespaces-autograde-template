@@ -3,3 +3,4 @@ numpy
 pytest
 nbconvert
 nbformat
+pytest-json-report
