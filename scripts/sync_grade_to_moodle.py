@@ -9,7 +9,9 @@ MOODLE_TOKEN = os.environ["MOODLE_TOKEN"]
 COURSE_ID = 11
 ACTIVITY_ID = 166
 
-MAP_FILE = "github_moodle_map.csv"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+MAP_FILE = os.path.join(BASE_DIR, "github_moodle_map.csv")
+RESULTS_FILE = os.path.join(BASE_DIR, "results.json")
 
 
 def get_grade_from_results():
