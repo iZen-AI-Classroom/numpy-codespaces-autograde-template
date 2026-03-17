@@ -176,6 +176,42 @@ jobs:
         run: |
           echo "Final score = ${{ steps.calc-score.outputs.score }}/100"
 
+      - name: Map GitHub user to Moodle student ID
+        id: map-student
+        if: always()
+        run: |
+          echo "GitHub actor is: $GITHUB_ACTOR"
+
+          python <<'PY'
+          import csv
+          import os
+          import sys
+
+          github_actor = os.environ["GITHUB_ACTOR"].strip().lower()
+          csv_path = "github_moodle_map.csv"
+
+          moodle_student_id = None
+
+          with open(csv_path, newline="", encoding="utf-8") as f:
+              reader = csv.DictReader(f)
+              for row in reader:
+                  gh = row["github_username"].strip().lower()
+                  if gh == github_actor:
+                      moodle_student_id = row["moodle_student_id"].strip()
+                      break
+
+          if not moodle_student_id:
+              print(f"No Moodle mapping found for GitHub user: {github_actor}")
+              sys.exit(1)
+
+          github_output = os.environ["GITHUB_OUTPUT"]
+          with open(github_output, "a", encoding="utf-8") as out:
+              out.write(f"moodle_student_id={moodle_student_id}\n")
+
+          print(f"Mapped {github_actor} -> Moodle student ID {moodle_student_id}")
+          PY
+
+
       - name: Send actual score to Moodle
         if: always()
         run: |
@@ -191,5 +227,5 @@ jobs:
             -d "component=mod_lti" \
             -d "activityid=${{ secrets.MOODLE_ACTIVITY_ID }}" \
             -d "itemnumber=0" \
-            -d "grades[0][studentid]=${{ secrets.MOODLE_STUDENT_ID }}" \
+            -d "grades[0][studentid]=${{ steps.map-student.outputs.moodle_student_id }}" \
             -d "grades[0][grade]=${{ steps.calc-score.outputs.score }}"
