@@ -182,7 +182,7 @@ jobs:
           echo "Sending score ${{ steps.calc-score.outputs.score }} to Moodle"
           echo "URL: ${{ secrets.MOODLE_URL }}webservice/rest/server.php"
       
-          curl -X POST "${{ secrets.MOODLE_URL }}webservice/rest/server.php" \
+          curl -X POST "https://staging.izen.ai/webservice/rest/server.php" \
             -d "wstoken=${{ secrets.MOODLE_TOKEN }}" \
             -d "wsfunction=core_grades_update_grades" \
             -d "moodlewsrestformat=json" \
