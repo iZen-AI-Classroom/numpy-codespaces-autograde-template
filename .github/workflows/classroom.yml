@@ -188,7 +188,7 @@ jobs:
             -d "moodlewsrestformat=json" \
             -d "source=github" \
             -d "courseid=${{ secrets.MOODLE_COURSE_ID }}" \
-            -d "component=mod_assign" \
+            -d "component=mod_lti" \
             -d "activityid=${{ secrets.MOODLE_ACTIVITY_ID }}" \
             -d "itemnumber=0" \
             -d "grades[0][studentid]=${{ secrets.MOODLE_STUDENT_ID }}" \
