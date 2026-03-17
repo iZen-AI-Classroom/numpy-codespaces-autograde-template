@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ]
   repository_dispatch:
+  workflow_dispatch:
 
 permissions:
   checks: write
@@ -30,6 +31,7 @@ jobs:
 
       - name: split_vertically
         id: split-vertically
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: split_vertically
@@ -40,6 +42,7 @@ jobs:
 
       - name: split_horizontally
         id: split-horizontally
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: split_horizontally
@@ -50,6 +53,7 @@ jobs:
 
       - name: split_and_merge_vertically
         id: split-and-merge-vertically
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: split_and_merge_vertically
@@ -60,6 +64,7 @@ jobs:
 
       - name: split_and_merge_horizontally
         id: split-and-merge-horizontally
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: split_and_merge_horizontally
@@ -70,6 +75,7 @@ jobs:
 
       - name: rotate_array
         id: rotate-array
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: rotate_array
@@ -80,6 +86,7 @@ jobs:
 
       - name: rotate_array_empty
         id: rotate-array-empty
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: rotate_array_empty
@@ -90,6 +97,7 @@ jobs:
 
       - name: create_array_int_cast
         id: create-array-int-cast
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: create_array_int_cast
@@ -100,6 +108,7 @@ jobs:
 
       - name: create_array_float
         id: create-array-float
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: create_array_float
@@ -110,6 +119,7 @@ jobs:
 
       - name: evaluate_basic_ops
         id: evaluate-basic-ops
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: evaluate_basic_ops
@@ -120,6 +130,7 @@ jobs:
 
       - name: evaluate_unary_ops
         id: evaluate-unary-ops
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: evaluate_unary_ops
@@ -130,6 +141,7 @@ jobs:
 
       - name: evaluate_errors
         id: evaluate-errors
+        continue-on-error: true
         uses: classroom-resources/autograding-command-grader@v1
         with:
           test-name: evaluate_errors
@@ -138,23 +150,45 @@ jobs:
           timeout: 10
           max-score: 5
 
-      - name: Autograding Reporter
-        uses: classroom-resources/autograding-grading-reporter@v1
-        env:
-          SPLIT_VERTICALLY_RESULTS: "${{ steps.split-vertically.outputs.result }}"
-          SPLIT_HORIZONTALLY_RESULTS: "${{ steps.split-horizontally.outputs.result }}"
-          SPLIT_AND_MERGE_VERTICALLY_RESULTS: "${{ steps.split-and-merge-vertically.outputs.result }}"
-          SPLIT_AND_MERGE_HORIZONTALLY_RESULTS: "${{ steps.split-and-merge-horizontally.outputs.result }}"
-          ROTATE_ARRAY_RESULTS: "${{ steps.rotate-array.outputs.result }}"
-          ROTATE_ARRAY_EMPTY_RESULTS: "${{ steps.rotate-array-empty.outputs.result }}"
-          CREATE_ARRAY_INT_CAST_RESULTS: "${{ steps.create-array-int-cast.outputs.result }}"
-          CREATE_ARRAY_FLOAT_RESULTS: "${{ steps.create-array-float.outputs.result }}"
-          EVALUATE_BASIC_OPS_RESULTS: "${{ steps.evaluate-basic-ops.outputs.result }}"
-          EVALUATE_UNARY_OPS_RESULTS: "${{ steps.evaluate-unary-ops.outputs.result }}"
-          EVALUATE_ERRORS_RESULTS: "${{ steps.evaluate-errors.outputs.result }}"
-        with:
-          runners: >-
-            split-vertically,split-horizontally,split-and-merge-vertically,
-            split-and-merge-horizontally,rotate-array,rotate-array-empty,
-            create-array-int-cast,create-array-float,evaluate-basic-ops,
-            evaluate-unary-ops,evaluate-errors
+      - name: Calculate total score
+        id: calc-score
+        if: always()
+        run: |
+          score=0
+
+          [ "${{ steps.split-vertically.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.split-horizontally.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.split-and-merge-vertically.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.split-and-merge-horizontally.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.rotate-array.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.rotate-array-empty.outcome }}" = "success" ] && score=$((score + 5))
+          [ "${{ steps.create-array-int-cast.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.create-array-float.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.evaluate-basic-ops.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.evaluate-unary-ops.outcome }}" = "success" ] && score=$((score + 10))
+          [ "${{ steps.evaluate-errors.outcome }}" = "success" ] && score=$((score + 5))
+
+          echo "score=$score" >> "$GITHUB_OUTPUT"
+          echo "Calculated score: $score"
+
+      - name: Show calculated score
+        if: always()
+        run: |
+          echo "Final score = ${{ steps.calc-score.outputs.score }}/100"
+
+      - name: Send actual score to Moodle
+        if: always()
+        run: |
+          echo "Sending score ${{ steps.calc-score.outputs.score }} to Moodle"
+
+          curl -X POST "${{ secrets.MOODLE_URL }}/webservice/rest/server.php" \
+            -d "wstoken=${{ secrets.MOODLE_TOKEN }}" \
+            -d "wsfunction=core_grades_update_grades" \
+            -d "moodlewsrestformat=json" \
+            -d "source=github" \
+            -d "courseid=${{ secrets.MOODLE_COURSE_ID }}" \
+            -d "component=mod_assign" \
+            -d "activityid=${{ secrets.MOODLE_ACTIVITY_ID }}" \
+            -d "itemnumber=0" \
+            -d "grades[0][studentid]=${{ secrets.MOODLE_STUDENT_ID }}" \
+            -d "grades[0][grade]=${{ steps.calc-score.outputs.score }}"
