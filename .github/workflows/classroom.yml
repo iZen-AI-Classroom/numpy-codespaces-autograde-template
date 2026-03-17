@@ -141,16 +141,20 @@ jobs:
       - name: Autograding Reporter
         uses: classroom-resources/autograding-grading-reporter@v1
         env:
-          SPLIT_VERTICALLY_RESULTS: "${{steps.split-vertically.outputs.result}}"
-          SPLIT_HORIZONTALLY_RESULTS: "${{steps.split-horizontally.outputs.result}}"
-          SPLIT_AND_MERGE_VERTICALLY_RESULTS: "${{steps.split-and-merge-vertically.outputs.result}}"
-          SPLIT_AND_MERGE_HORIZONTALLY_RESULTS: "${{steps.split-and-merge-horizontally.outputs.result}}"
-          ROTATE_ARRAY_RESULTS: "${{steps.rotate-array.outputs.result}}"
-          ROTATE_ARRAY_EMPTY_RESULTS: "${{steps.rotate-array-empty.outputs.result}}"
-          CREATE_ARRAY_INT_CAST_RESULTS: "${{steps.create-array-int-cast.outputs.result}}"
-          CREATE_ARRAY_FLOAT_RESULTS: "${{steps.create-array-float.outputs.result}}"
-          EVALUATE_BASIC_OPS_RESULTS: "${{steps.evaluate-basic-ops.outputs.result}}"
-          EVALUATE_UNARY_OPS_RESULTS: "${{steps.evaluate-unary-ops.outputs.result}}"
-          EVALUATE_ERRORS_RESULTS: "${{steps.evaluate-errors.outputs.result}}"
+          SPLIT_VERTICALLY_RESULTS: "${{ steps.split-vertically.outputs.result }}"
+          SPLIT_HORIZONTALLY_RESULTS: "${{ steps.split-horizontally.outputs.result }}"
+          SPLIT_AND_MERGE_VERTICALLY_RESULTS: "${{ steps.split-and-merge-vertically.outputs.result }}"
+          SPLIT_AND_MERGE_HORIZONTALLY_RESULTS: "${{ steps.split-and-merge-horizontally.outputs.result }}"
+          ROTATE_ARRAY_RESULTS: "${{ steps.rotate-array.outputs.result }}"
+          ROTATE_ARRAY_EMPTY_RESULTS: "${{ steps.rotate-array-empty.outputs.result }}"
+          CREATE_ARRAY_INT_CAST_RESULTS: "${{ steps.create-array-int-cast.outputs.result }}"
+          CREATE_ARRAY_FLOAT_RESULTS: "${{ steps.create-array-float.outputs.result }}"
+          EVALUATE_BASIC_OPS_RESULTS: "${{ steps.evaluate-basic-ops.outputs.result }}"
+          EVALUATE_UNARY_OPS_RESULTS: "${{ steps.evaluate-unary-ops.outputs.result }}"
+          EVALUATE_ERRORS_RESULTS: "${{ steps.evaluate-errors.outputs.result }}"
         with:
-          runners: split-vertically,split-horizontally,split-and-merge-vertically,split-and-merge-horizontally,rotate-array,rotate-array-empty,create-array-int-cast,create-array-float,evaluate-basic-ops,evaluate-unary-ops,evaluate-errors
+          runners: >-
+            split-vertically,split-horizontally,split-and-merge-vertically,
+            split-and-merge-horizontally,rotate-array,rotate-array-empty,
+            create-array-int-cast,create-array-float,evaluate-basic-ops,
+            evaluate-unary-ops,evaluate-errors
